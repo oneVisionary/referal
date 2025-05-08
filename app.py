@@ -332,6 +332,58 @@ def upload_audio():
 
 
 
+@app.route('/testingCalender', methods=['GET'])
+def testingCalender():
+    try:
+        transcription = speech_to_text(file_name)
+        print("Transcription:", transcription)
+
+        if not transcription or "could not" in transcription.lower():
+            return jsonify({
+                "status": "error",
+                "message": "Transcription failed",
+                "transcription": transcription
+            }), 400
+
+        # Generate MoM
+        mom = generate_mom_from_transcription(transcription)
+        print("MoM:", mom)
+
+        # Validate generated data
+        if not mom.get('title') or not mom.get('description'):
+            return jsonify({
+                "status": "error",
+                "message": "Failed to generate MoM from transcription",
+                "transcription": transcription
+            }), 500
+
+        # Prepare Firestore document
+        mail_data = {
+            "title": mom.get('title', ""),
+            "description": mom.get('description', ""),
+            "date": mom.get('date', ""),
+            "created_at": mom.get('created_at', datetime.now(timezone.utc).isoformat())
+        }
+
+        db.collection('mail').add(mail_data)
+        print("MoM data added to Firestore")
+
+        return jsonify({
+            "status": "success",
+            "message": "Audio processed and MoM saved",
+            "data": mail_data
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": "Exception occurred during processing",
+            "error": str(e)
+        }), 500
+
+
+
+
 
 def speech_to_text(file_name):
     # Initialize the recognizer
