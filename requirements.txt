@@ -9,3 +9,4 @@ google-generativeai
 pydub
 SpeechRecognition
 python-dateutil
+gunicorn
