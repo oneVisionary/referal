@@ -1,0 +1,11 @@
+Flask
+Flask-Cors
+Flask-Mail
+firebase-admin
+google-auth
+google-auth-oauthlib
+google-api-python-client
+google-generativeai
+pydub
+SpeechRecognition
+python-dateutil
